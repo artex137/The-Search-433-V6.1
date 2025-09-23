@@ -603,7 +603,9 @@ def download_image(url: str, filename_hint: str) -> str:
         print("Image download error:", e); return FALLBACK
 
 def unsplash_unique(query: str, used_ids: Set[str]) -> str:
-    if not UNSPLASH_KEY: return FALLBACK
+    if not UNSPLASH_KEY:
+        print("  [warn] UNSPLASH_KEY not set, cannot fetch from Unsplash.")
+        return FALLBACK
     for _ in range(6):
         try:
             r = requests.get(
@@ -612,15 +614,26 @@ def unsplash_unique(query: str, used_ids: Set[str]) -> str:
                 params={"query": query, "orientation": "landscape", "content_filter":"high"},
                 timeout=20,
             )
-            r.raise_for_status()
+            if not r.ok:
+                print(f"  [warn] Unsplash API request failed with status {r.status_code}:")
+                print(f"  [warn] Response: {r.text}")
+                r.raise_for_status() # This will trigger the except block
+
             data = r.json()
             img_id = data.get("id"); img_url = data.get("urls",{}).get("regular")
-            if not img_id or not img_url: continue
-            if img_id in used_ids: continue
+            if not img_id or not img_url:
+                print("  [info] Unsplash response missing id or url.")
+                continue
+            if img_id in used_ids:
+                print(f"  [info] Unsplash image {img_id} already used, trying again.")
+                continue
+            
+            print(f"  -> Found Unsplash image {img_id}. Downloading...")
             used_ids.add(img_id)
             return download_image(img_url, slugify(f"{query}-{img_id}")[:50])
         except Exception as e:
-            print("Unsplash error:", e); break
+            print(f"  [error] Unsplash fallback failed: {e}")
+            break # Stop trying if there's a fundamental error
     return FALLBACK
 
 # ===== HTML block replace =====
@@ -766,11 +779,17 @@ def main():
         _scraped_text, scraped_imgs = scrape_article(cand["link"])
         hero_rel = FALLBACK
         if scraped_imgs:
+            print(f"  -> Scraper found {len(scraped_imgs)} images. Attempting to download first one.")
             try:
                 hero_rel = download_image(scraped_imgs[0], slugify(cand["title"])[:50])
-            except Exception:
+            except Exception as e:
+                print(f"  [warn] Failed to download scraped image: {e}")
                 hero_rel = FALLBACK
+        else:
+            print("  -> Scraper found no images.")
+
         if hero_rel == FALLBACK:
+            print("  -> Attempting Unsplash fallback...")
             hero_rel = unsplash_unique(cand["interest"], used_img_ids)
 
         # Write article
