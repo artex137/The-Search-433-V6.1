@@ -41,3 +41,4 @@ jobs:
         with:
           commit_message: "auto: refresh headlines"
           branch: main
+          pull_strategy: --rebase
