@@ -606,7 +606,8 @@ def unsplash_unique(query: str, used_ids: Set[str]) -> str:
     if not UNSPLASH_KEY:
         print("  [warn] UNSPLASH_KEY not set, cannot fetch from Unsplash.")
         return FALLBACK
-    for _ in range(6):
+    for i in range(6):
+        print(f"  -> Unsplash attempt {i+1}/6 for query: '{query}'")
         try:
             r = requests.get(
                 "https://api.unsplash.com/photos/random",
@@ -617,12 +618,22 @@ def unsplash_unique(query: str, used_ids: Set[str]) -> str:
             if not r.ok:
                 print(f"  [warn] Unsplash API request failed with status {r.status_code}:")
                 print(f"  [warn] Response: {r.text}")
-                r.raise_for_status() # This will trigger the except block
+                # If it's a client error (like 404 Not Found), just continue to the next attempt.
+                if 400 <= r.status_code < 500:
+                    continue
+                r.raise_for_status()
 
             data = r.json()
-            img_id = data.get("id"); img_url = data.get("urls",{}).get("regular")
+            # It's possible to get a 200 OK but have an empty result, especially with content filtering.
+            if not data or 'urls' not in data:
+                print("  [info] Unsplash returned empty data or no image URL. Retrying...")
+                continue
+
+            img_id = data.get("id")
+            img_url = data.get("urls", {}).get("regular")
+
             if not img_id or not img_url:
-                print("  [info] Unsplash response missing id or url.")
+                print("  [info] Unsplash response missing id or url. Retrying...")
                 continue
             if img_id in used_ids:
                 print(f"  [info] Unsplash image {img_id} already used, trying again.")
@@ -631,9 +642,14 @@ def unsplash_unique(query: str, used_ids: Set[str]) -> str:
             print(f"  -> Found Unsplash image {img_id}. Downloading...")
             used_ids.add(img_id)
             return download_image(img_url, slugify(f"{query}-{img_id}")[:50])
+        except requests.exceptions.RequestException as e:
+            print(f"  [error] Unsplash request failed: {e}. Retrying...")
+            continue # Continue to the next attempt on network errors
         except Exception as e:
-            print(f"  [error] Unsplash fallback failed: {e}")
-            break # Stop trying if there's a fundamental error
+            print(f"  [error] Unsplash fallback failed with an unexpected error: {e}")
+            break # Stop for other unexpected errors
+            
+    print("  [warn] All Unsplash attempts failed. Using fallback image.")
     return FALLBACK
 
 # ===== HTML block replace =====
@@ -790,7 +806,17 @@ def main():
 
         if hero_rel == FALLBACK:
             print("  -> Attempting Unsplash fallback...")
-            hero_rel = unsplash_unique(cand["interest"], used_img_ids)
+            
+            # Attempt 1: Use keywords from the title for a specific search
+            title_keywords = " ".join(tokenize_title(cand["title"])[:3]) # Get up to 3 keywords
+            if title_keywords:
+                print(f"  -> Unsplash attempt 1: query based on title keywords: '{title_keywords}'")
+                hero_rel = unsplash_unique(title_keywords, used_img_ids)
+
+            # Attempt 2: If the first attempt failed, fall back to the broader interest category
+            if hero_rel == FALLBACK:
+                print(f"  -> Unsplash attempt 2: falling back to broader interest query: '{cand['interest']}'")
+                hero_rel = unsplash_unique(cand['interest'], used_img_ids)
 
         # Write article
         try:
