@@ -1,5 +1,13 @@
 [
   {
+    "title": "Comet 3I/ATLAS",
+    "file": "comet-3i-atlas.html",
+    "image": "assets/comet-3i-atlas.jpg",
+    "date": "2025-10-01 07:27 UTC",
+    "source_url": "https://science.nasa.gov/solar-system/comets/3i-atlas/",
+    "fingerprint": "4f15a3a7cf828394c98cae449d7aa3642cd5bbed"
+  },
+  {
     "title": "3I/ATLAS comet estimated size growing, new data shows | Elizabeth Vargas Reports",
     "file": "3i-atlas-comet-estimated-size-growing-new-data-shows-elizabeth-vargas-reports.html",
     "image": "assets/3i-atlas-comet-estimated-size-growing-new-data-sho.png",
