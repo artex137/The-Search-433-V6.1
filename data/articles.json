@@ -1,5 +1,13 @@
 [
   {
+    "title": "Astronomy Picture of the Day",
+    "file": "astronomy-picture-of-the-day.html",
+    "image": "assets/astronomy-picture-of-the-day.jpg",
+    "date": "2025-11-21 05:43 UTC",
+    "source_url": "https://apod.nasa.gov/apod/astropix.html",
+    "fingerprint": "9b10c8cbc98f2b15ff6a0615d77343487267c26f"
+  },
+  {
     "title": "Breaking News: Newly-Discovered Sideways Lines Might Trace the Release of Smaller Objects by…",
     "file": "breaking-news-newly-discovered-sideways-lines-might-trace-the-release-of-smaller-objects-by.html",
     "image": "assets/news-newly-discovered-f-qb-q105uy.jpg",
