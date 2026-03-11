@@ -1,0 +1,11 @@
+<svg width="5600" height="575.78" xmlns="http://www.w3.org/2000/svg">
+ <defs>
+  <style>.cls-1{fill:#fff;}.cls-1,.cls-2{fill-rule:evenodd;}.cls-2{fill:#141518;}</style>
+ </defs>
+ <g>
+  <title>Layer 1</title>
+  <path id="svg_1" d="m384.49,0c-119.07,0 -216,97 -216,216.16c0,118.83 96.88,215.51 216,215.51c118.71,0 215.29,-96.68 215.29,-215.51c0,-119.19 -96.58,-216.16 -215.29,-216.16z" class="cls-1"/>
+  <path id="svg_2" d="m0,575.78l105.45,0l0,-575.78l-105.45,0l0,575.78z" class="cls-2"/>
+  <text stroke="#000" transform="matrix(21.562127192205523,0,0,21.562127192205523,-19035.06463609266,-1691.1701334858187) " xml:space="preserve" text-anchor="start" font-family="sans-serif" font-size="24" id="svg_3" y="96.82781" x="912.87473" opacity="undefined" stroke-width="0" fill="#ffffff">BECOME A PATRON</text>
+ </g>
+</svg>
